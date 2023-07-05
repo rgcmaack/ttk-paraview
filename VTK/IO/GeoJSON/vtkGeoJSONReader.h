@@ -87,6 +87,15 @@ public:
 
   ///@{
   /**
+   * Set/get if data array for serialized GeoJSON "properties" should be created.
+   */
+  vtkSetMacro(SerializedPropertiesArray, bool);
+  vtkGetMacro(SerializedPropertiesArray, bool);
+  vtkBooleanMacro(SerializedPropertiesArray, bool);
+  ///@}
+
+  ///@{
+  /**
    * Set/get name of data array for serialized GeoJSON "properties" node.
    * If specified, data will be stored as vtkCellData/vtkStringArray.
    */
@@ -115,6 +124,7 @@ protected:
   bool StringInputMode;
   bool TriangulatePolygons;
   bool OutlinePolygons;
+  bool SerializedPropertiesArray;
   char* SerializedPropertiesArrayName;
   ///@}
 

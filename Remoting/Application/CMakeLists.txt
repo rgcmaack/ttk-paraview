@@ -287,6 +287,11 @@ if (TARGET VTK::IOLegacy)
     Resources/writers_iolegacy.xml)
 endif()
 
+if (TARGET VTK::IOGeoJSON)
+  list(APPEND xml_files
+    Resources/readers_iogeojson.xml)
+endif()
+
 if (TARGET VTK::IOGeometry)
   list(APPEND xml_files
     Resources/readers_iogeometry.xml

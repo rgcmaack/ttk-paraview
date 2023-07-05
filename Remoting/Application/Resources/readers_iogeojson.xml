@@ -1,0 +1,126 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkGeoJSONReader"
+                 label="Geo JSON Reader"
+                 name="geojsonreader">
+      <Documentation long_help="Reads geojson data files into polydata dataset."
+                     short_help="Read geojson data files.">The Geo JSON Reader
+                     reads geojson data files. The expected file
+                     extension is .geojson. The output of this reader is a
+                     vtkPolyData</Documentation>
+
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <FileListDomain name="files" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="StringInputMode"
+                                   value="0" />
+        </Hints>
+        <Documentation>This property specifies the file name for the geojson
+        reader.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetStringInput"
+                            name="StringInput"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="StringInputMode"
+                                   value="1" />
+        </Hints>
+        <Documentation>String used as data input (instead of file) when
+        StringInputMode is enabled</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetStringInputMode"
+                         default_values="0"
+                         name="StringInputMode"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Set/get whether to use StringInput instead of reading
+        input from file. The default is off</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetTriangulatePolygons"
+                         default_values="0"
+                         name="TriangulatePolygons"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Set/get whether to convert all output polygons to
+        triangles. Note that if OutinePolygons mode is on, then no output
+        polygons are generated, and in that case, this option is not relevant.
+        The default is off.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetOutlinePolygons"
+                         default_values="0"
+                         name="OutlinePolygons"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Set/get option to generate the border outlining each
+        polygon, so that the output cells for polygons are vtkPolyLine
+        instances. The default is off.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetSerializedPropertiesArray"
+                         default_values="0"
+                         name="UseSerializedPropertiesArray"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Set/get option to generate the border outlining each
+        polygon, so that the output cells for polygons are vtkPolyLine
+        instances. The default is off.</Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetSerializedPropertiesArrayName"
+                            name="SerializedPropertiesArrayName"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseSerializedPropertiesArray"
+                                   value="1" />
+        </Hints>
+        <Documentation>Set/get name of data array for serialized GeoJSON
+        "properties" node. If specified, data will be stored as
+        vtkCellData/vtkStringArray.</Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup panel_widget="Line" label="Input options">
+        <Property name="FileName" />
+        <Property name="StringInput" />
+        <Property name="StringInputMode" />
+      </PropertyGroup>
+
+      <PropertyGroup panel_widget="Line" label="Output options">
+        <Property name="TriangulatePolygons" />
+        <Property name="OutlinePolygons" />
+        <Property name="UseSerializedPropertiesArray" />
+        <Property name="SerializedPropertiesArrayName" />
+      </PropertyGroup>
+
+      <Hints>
+        <ReaderFactory extensions="geojson"
+                       file_description="GeoJSON Files" />
+      </Hints>
+      <!-- End GeoJSON Reader -->
+    </SourceProxy>
+
+    <!-- end of "sources" -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

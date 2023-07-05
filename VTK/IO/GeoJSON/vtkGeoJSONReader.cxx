@@ -56,7 +56,7 @@ public:
 
   // Parse the Json Value corresponding to the root of the geoJSON data from the file
   void ParseRoot(const Json::Value& root, vtkPolyData* output, bool outlinePolygons,
-    const char* serializedPropertiesArrayName);
+    bool serializedPropertiesArray, const char* serializedPropertiesArrayName);
 
   // Verify if file exists and can be read by the parser
   // If exists, parse into Jsoncpp data structure
@@ -68,7 +68,8 @@ public:
 
   // Extract property values from json node
   void ParseFeatureProperties(const Json::Value& propertiesNode,
-    std::vector<GeoJSONProperty>& properties, const char* serializedPropertiesArrayName);
+    std::vector<GeoJSONProperty>& properties, bool serializedPropertiesArray,
+    const char* serializedPropertiesArrayName);
 
   void InsertFeatureProperties(
     vtkPolyData* polyData, const std::vector<GeoJSONProperty>& featureProperties);
@@ -76,7 +77,8 @@ public:
 
 //------------------------------------------------------------------------------
 void vtkGeoJSONReader::GeoJSONReaderInternal::ParseRoot(const Json::Value& root,
-  vtkPolyData* output, bool outlinePolygons, const char* serializedPropertiesArrayName)
+  vtkPolyData* output, bool outlinePolygons, bool serializedPropertiesArray,
+  const char* serializedPropertiesArrayName)
 {
   // Initialize geometry containers
   vtkNew<vtkPoints> points;
@@ -96,12 +98,20 @@ void vtkGeoJSONReader::GeoJSONReaderInternal::ParseRoot(const Json::Value& root,
   featureIdArray->Delete();
 
   // Initialize properties arrays
-  if (serializedPropertiesArrayName)
+  if (serializedPropertiesArray && serializedPropertiesArrayName != nullptr)
   {
-    vtkStringArray* propertiesArray = vtkStringArray::New();
-    propertiesArray->SetName(serializedPropertiesArrayName);
-    output->GetCellData()->AddArray(propertiesArray);
-    propertiesArray->Delete();
+    if (serializedPropertiesArrayName[0] != '\0')
+    {
+
+      vtkStringArray* propertiesArray = vtkStringArray::New();
+      propertiesArray->SetName(serializedPropertiesArrayName);
+      output->GetCellData()->AddArray(propertiesArray);
+      propertiesArray->Delete();
+    }
+    else
+    {
+      vtkGenericWarningMacro("serializedPropertiesArrayName empty!");
+    }
   }
 
   vtkAbstractArray* array;
@@ -176,7 +186,8 @@ void vtkGeoJSONReader::GeoJSONReaderInternal::ParseRoot(const Json::Value& root,
       // Append extracted geometry to existing outputData
       Json::Value featureNode = rootFeatures[i];
       Json::Value propertiesNode = featureNode["properties"];
-      this->ParseFeatureProperties(propertiesNode, properties, serializedPropertiesArrayName);
+      this->ParseFeatureProperties(
+        propertiesNode, properties, serializedPropertiesArray, serializedPropertiesArrayName);
       vtkNew<vtkGeoJSONFeature> feature;
       feature->SetOutlinePolygons(outlinePolygons);
       feature->ExtractGeoJSONFeature(featureNode, output);
@@ -186,7 +197,8 @@ void vtkGeoJSONReader::GeoJSONReaderInternal::ParseRoot(const Json::Value& root,
   else if ("Feature" == strRootType)
   {
     // Process single feature
-    this->ParseFeatureProperties(root, properties, serializedPropertiesArrayName);
+    this->ParseFeatureProperties(
+      root, properties, serializedPropertiesArray, serializedPropertiesArrayName);
     vtkNew<vtkGeoJSONFeature> feature;
     feature->SetOutlinePolygons(outlinePolygons);
 
@@ -269,7 +281,7 @@ int vtkGeoJSONReader::GeoJSONReaderInternal::CanParseString(char* input, Json::V
 //------------------------------------------------------------------------------
 void vtkGeoJSONReader::GeoJSONReaderInternal::ParseFeatureProperties(
   const Json::Value& propertiesNode, std::vector<GeoJSONProperty>& featureProperties,
-  const char* serializedPropertiesArrayName)
+  bool serializedPropertiesArray, const char* serializedPropertiesArrayName)
 {
   featureProperties.clear();
 
@@ -313,7 +325,8 @@ void vtkGeoJSONReader::GeoJSONReaderInternal::ParseFeatureProperties(
   }
 
   // Add GeoJSON string if enabled
-  if (serializedPropertiesArrayName)
+  if (serializedPropertiesArray && serializedPropertiesArrayName != nullptr &&
+    serializedPropertiesArrayName[0] != '\0')
   {
     property.Name = serializedPropertiesArrayName;
 
@@ -375,6 +388,7 @@ vtkGeoJSONReader::vtkGeoJSONReader()
   this->StringInputMode = false;
   this->TriangulatePolygons = false;
   this->OutlinePolygons = false;
+  this->SerializedPropertiesArray = false;
   this->SerializedPropertiesArrayName = nullptr;
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
@@ -450,8 +464,8 @@ int vtkGeoJSONReader::RequestData(vtkInformation* vtkNotUsed(request),
   // into appropriate vtkPolyData
   if (root.isObject())
   {
-    this->Internal->ParseRoot(
-      root, output, this->OutlinePolygons, this->SerializedPropertiesArrayName);
+    this->Internal->ParseRoot(root, output, this->OutlinePolygons, this->SerializedPropertiesArray,
+      this->SerializedPropertiesArrayName);
 
     // Convert Concave Polygons to convex polygons using triangulation
     if (output->GetNumberOfPolys() && this->TriangulatePolygons)

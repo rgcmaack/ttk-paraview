@@ -53,6 +53,7 @@ OPTIONAL_DEPENDS
   VTK::IOChemistry
   VTK::IOCityGML
   VTK::IOGDAL
+  VTK::IOGeoJSON
   VTK::IOGeometry
   VTK::IOH5part
   VTK::IOH5Rage
