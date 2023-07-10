@@ -433,6 +433,42 @@ void vtkGeoJSONReader::AddFeatureProperty(const char* name, vtkVariant& typeAndD
   }
 }
 
+void vtkGeoJSONReader::AddFeatureProperties(const char* input)
+{
+  if (input != nullptr && input[0] != '\0')
+  {
+    std::stringstream propStream(input);
+    std::string propertySegment;
+
+    while (std::getline(propStream, propertySegment, ','))
+    {
+      GeoJSONReaderInternal::GeoJSONProperty property;
+      std::stringstream singleFeatureStream(propertySegment);
+      std::string featureName;
+      std::string defaultValue;
+
+      if (std::getline(singleFeatureStream, featureName, ':') &&
+        std::getline(singleFeatureStream, defaultValue, ':'))
+      {
+        featureName.erase(
+          std::remove(featureName.begin(), featureName.end(), '\"'), featureName.end());
+        defaultValue.erase(
+          std::remove(defaultValue.begin(), defaultValue.end(), '\"'), defaultValue.end());
+        vtkGenericWarningMacro(<< featureName.c_str() << " / " << defaultValue.c_str());
+        property.Name = featureName;
+        if (defaultValue.find("\"") != std::string::npos)
+          property.Value = vtkVariant(defaultValue.c_str());
+        else if (defaultValue.find(".") != std::string::npos)
+          property.Value = vtkVariant(std::stof(defaultValue));
+        else
+          property.Value = vtkVariant(std::stoi(defaultValue));
+
+        this->Internal->PropertySpecs.push_back(property);
+      }
+    }
+  }
+}
+
 //------------------------------------------------------------------------------
 int vtkGeoJSONReader::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(request), vtkInformationVector* outputVector)
@@ -464,6 +500,9 @@ int vtkGeoJSONReader::RequestData(vtkInformation* vtkNotUsed(request),
   // into appropriate vtkPolyData
   if (root.isObject())
   {
+    if (this->FeatureNamesInput != nullptr && this->FeatureNamesInput[0] != '\0')
+      AddFeatureProperties(this->FeatureNamesInput);
+
     this->Internal->ParseRoot(root, output, this->OutlinePolygons, this->SerializedPropertiesArray,
       this->SerializedPropertiesArrayName);
 

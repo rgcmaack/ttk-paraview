@@ -103,11 +103,24 @@ public:
   vtkGetStringMacro(SerializedPropertiesArrayName);
   ///@}
 
+  ///@{
+  /**
+   * Set/get feature names of data array for serialized GeoJSON "properties" node.
+   * If specified, data will be stored as multiple arrays depending on the type.
+   * Specify like name:defaultValue, name2:defaultValue
+   * E.g. feature1:1,feature2:"House",feature3:0.0
+   */
+  vtkSetStringMacro(FeatureNamesInput);
+  vtkGetStringMacro(FeatureNamesInput);
+  ///@}
+
   /**
    * Specify feature property to read in with geometry objects
    * Note that defaultValue specifies both type & value
    */
   void AddFeatureProperty(const char* name, vtkVariant& typeAndDefaultValue);
+
+  void AddFeatureProperties(const char* input);
 
 protected:
   vtkGeoJSONReader();
@@ -121,6 +134,7 @@ protected:
     vtkInformationVector* outputVector) override;
   char* FileName;
   char* StringInput;
+  char* FeatureNamesInput;
   bool StringInputMode;
   bool TriangulatePolygons;
   bool OutlinePolygons;

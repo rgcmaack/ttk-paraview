@@ -101,6 +101,16 @@
         vtkCellData/vtkStringArray.</Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty animateable="0"
+                            command="SetFeatureNamesInput"
+                            name="FeatureNames"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <Documentation>Set/get name of data array for serialized GeoJSON
+        "properties" node. If specified, data will be stored as
+        vtkCellData/vtkStringArray.</Documentation>
+      </StringVectorProperty>
+
       <PropertyGroup panel_widget="Line" label="Input options">
         <Property name="FileName" />
         <Property name="StringInput" />
@@ -112,6 +122,7 @@
         <Property name="OutlinePolygons" />
         <Property name="UseSerializedPropertiesArray" />
         <Property name="SerializedPropertiesArrayName" />
+        <Property name="FeatureNames" />
       </PropertyGroup>
 
       <Hints>
